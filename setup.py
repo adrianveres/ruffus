@@ -28,6 +28,7 @@ setup(
         maintainer_email="ruffus_lib@llew.org.uk",
         author='Leo Goodstadt',
         author_email='ruffus@llew.org.uk',
+        use_2to3=True,
         long_description=\
 """
 ***************************************
