@@ -93,7 +93,7 @@ from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 import traceback
 import types
-from itertools import imap
+import itertools
 import textwrap
 import time
 from multiprocessing.managers import SyncManager
@@ -3580,7 +3580,7 @@ def pipeline_run(target_tasks                     = [],
     if pool:
         pool_func = pool.imap_unordered
     else:
-        pool_func = imap
+        pool_func = itertools.imap
 
 
 
