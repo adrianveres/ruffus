@@ -26,7 +26,7 @@
 #################################################################################
 
 
-from itertools import izip
+
 def adjacent_pairs_iterate (array, reverse = False):
     """
     returns pairs of iterators to successive positions
@@ -41,20 +41,20 @@ def adjacent_pairs_iterate (array, reverse = False):
     else:
         curr = iter(array)
         next = iter(array)
-    next.next() 
-    for i, j in izip(curr, next):
+    next(next) 
+    for i, j in zip(curr, next):
         yield i, j    
     
 
 def unit_test():
-    numbers = range(10)
-    print "Forward"
+    numbers = list(range(10))
+    print("Forward")
     for i, j in adjacent_pairs_iterate(numbers):
-        print i, j
-    print "Reversed"
+        print(i, j)
+    print("Reversed")
     for i, j in adjacent_pairs_iterate(numbers, reverse=True):
-        print i, j
-    print numbers
+        print(i, j)
+    print(numbers)
         
 if __name__ == '__main__':
     unit_test()

@@ -16,7 +16,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 
 # add self to search path for testing
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
@@ -69,7 +69,7 @@ mandatory_parameters = ["dot_file"]
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys
@@ -174,7 +174,7 @@ def task_dependencies_from_dotfile(stream):
         #
         if "=" in line:
             continue;
-        nodes = map(lambda x: x.strip(),  line.split('->'))
+        nodes = [x.strip() for x in line.split('->')]
         for name1, name2 in adjacent_pairs_iterate(nodes):
             which_task_follows[name2].append(name1)
             all_tasks[name1] = 1
@@ -189,13 +189,13 @@ def task_dependencies_from_dotfile(stream):
     disordered = True
     while (disordered):
         disordered = False
-        for to_task, from_tasks in which_task_follows.iteritems():
+        for to_task, from_tasks in which_task_follows.items():
             for f in from_tasks:
                 if all_tasks[to_task] <= all_tasks[f]:
                     all_tasks[to_task] += all_tasks[f]
                     disordered = True
     
-    sorted_task_names =  list(sorted(all_tasks.keys(), key=lambda x:all_tasks[x]))
+    sorted_task_names =  list(sorted(list(all_tasks.keys()), key=lambda x:all_tasks[x]))
     return which_task_follows, sorted_task_names, task_decorators, io_tasks, task_descriptions
 
 
@@ -209,10 +209,10 @@ def task_dependencies_from_dotfile(stream):
 def generate_program_task_file(stream, task_dependencies, task_names, 
                                 task_decorators, io_tasks, task_descriptions):
 
-    print >> sys.stderr, "task_decorators   = ", dumps(task_decorators, indent = 4)
-    print >> sys.stderr, "task_names        = ", dumps(task_names)
-    print >> sys.stderr, "task_dependencies = ", dumps(task_dependencies)
-    print >> sys.stderr, "io_tasks          = ", dumps(list(io_tasks))
+    print("task_decorators   = ", dumps(task_decorators, indent = 4), file=sys.stderr)
+    print("task_names        = ", dumps(task_names), file=sys.stderr)
+    print("task_dependencies = ", dumps(task_dependencies), file=sys.stderr)
+    print("io_tasks          = ", dumps(list(io_tasks)), file=sys.stderr)
 
 
     if options.jumble_task_order:
@@ -302,7 +302,7 @@ except Exception, e:
 
 
 # get help string
-f =StringIO.StringIO()
+f =io.StringIO()
 parser.print_help(f)
 helpstr = f.getvalue()
 (options, remaining_args) = parser.parse_args()

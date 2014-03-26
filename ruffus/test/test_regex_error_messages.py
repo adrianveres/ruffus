@@ -12,7 +12,7 @@ import unittest
 import os
 import sys
 import shutil
-from StringIO import StringIO
+from io import StringIO
 import time
 
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]

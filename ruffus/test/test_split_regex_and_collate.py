@@ -16,7 +16,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-from StringIO import StringIO
+from io import StringIO
 import re,time
 import operator
 from collections import defaultdict

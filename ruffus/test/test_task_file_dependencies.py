@@ -55,7 +55,7 @@ class Test_needs_update_check_modify_time(unittest.TestCase):
         """
         import tempfile,time
         self.files  = list()
-        for i in xrange(6):
+        for i in range(6):
             #test_file =tempfile.NamedTemporaryFile(delete=False, prefix='testing_tmp')
             #self.files.append (test_file.name)
             #test_file.close()

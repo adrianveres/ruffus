@@ -16,7 +16,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 
 # add self to search path for testing
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
@@ -97,7 +97,7 @@ parameters = [
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys
@@ -140,7 +140,7 @@ def is_job_uptodate (infiles, outfiles, *extra_params):
 
 
 def test_post_task_function ():
-    print "Hooray"
+    print("Hooray")
 
 import time
 def test_job_io(infiles, outfiles, extra_params):
@@ -181,7 +181,7 @@ def test_job_io(infiles, outfiles, extra_params):
 
 
 # get help string
-f =StringIO.StringIO()
+f =io.StringIO()
 parser.print_help(f)
 helpstr = f.getvalue()
 (options, remaining_args) = parser.parse_args()

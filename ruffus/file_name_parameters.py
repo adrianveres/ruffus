@@ -66,18 +66,18 @@ if __name__ == '__main__':
     import sys
     sys.path.insert(0,".")
 
-from ruffus_exceptions import *
+from .ruffus_exceptions import *
 #from file_name_parameters import *
-from ruffus_utility import *
+from .ruffus_utility import *
 
-import dbdict
+from . import dbdict
 
 class t_extra_inputs:
-    (ADD_TO_INPUTS, REPLACE_INPUTS, KEEP_INPUTS) = range(3)
+    (ADD_TO_INPUTS, REPLACE_INPUTS, KEEP_INPUTS) = list(range(3))
 
 class t_combinatorics_type:
     (   COMBINATORICS_PRODUCT, COMBINATORICS_PERMUTATIONS,
-        COMBINATORICS_COMBINATIONS, COMBINATORICS_COMBINATIONS_WITH_REPLACEMENT) = range(4)
+        COMBINATORICS_COMBINATIONS, COMBINATORICS_COMBINATIONS_WITH_REPLACEMENT) = list(range(4))
 
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
@@ -268,7 +268,7 @@ class t_params_tasks_globs_run_time_data(object):
         if parameter is a simple string, wrap that in a list unless it is glob
         Useful for simple @transform cases
         """
-        if isinstance(self.params, basestring) and not is_glob(self.params):
+        if isinstance(self.params, str) and not is_glob(self.params):
             self.params = [self.params]
             return True
         return False
@@ -467,7 +467,7 @@ def needs_update_check_modify_time (*params, **kwargs):
         # allow job_history not to be specified and reopen dbdict file redundantly...
         #   Either this or fix all the test cases
         #job_history = dbdict.open(RUFFUS_HISTORY_FILE, picklevalues=True)
-        print >>sys.stderr, "Oops: Should only appear in test code"
+        print("Oops: Should only appear in test code", file=sys.stderr)
         job_history = open_job_history (None)
 
 
@@ -762,7 +762,7 @@ def touch_file_factory (orig_args, register_cleanup):
     """
     file_names = orig_args
     # accepts unicode
-    if isinstance (orig_args, basestring):
+    if isinstance (orig_args, str):
         file_names = [orig_args]
     else:
         # make copy so when original is modifies, we don't get confused!

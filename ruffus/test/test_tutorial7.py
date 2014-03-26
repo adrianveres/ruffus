@@ -75,10 +75,10 @@ def step_5_calculate_sum_of_squares (input_file_name, output_file_name):
 
 
 def print_hooray_again():
-    print "hooray again"
+    print("hooray again")
 
 def print_whoppee_again():
-    print "whoppee again"
+    print("whoppee again")
 
 
 #---------------------------------------------------------------
@@ -103,7 +103,7 @@ def step_6_calculate_variance (input_file_names, output_file_name):
     # added up all the sum_squared, and sum and cnt_values from all the chunks
     #
     for input_file_name in input_file_names:
-        sum_squared, sum, cnt_values = map(float, open(input_file_name).readlines())
+        sum_squared, sum, cnt_values = list(map(float, open(input_file_name).readlines()))
         all_sum_squared += sum_squared
         all_sum         += sum
         all_cnt_values  += cnt_values
@@ -112,7 +112,7 @@ def step_6_calculate_variance (input_file_names, output_file_name):
     #
     #   print output
     #
-    print >>output, variance
+    print(variance, file=output)
 
 #---------------------------------------------------------------
 #

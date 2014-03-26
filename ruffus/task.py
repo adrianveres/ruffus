@@ -75,7 +75,7 @@ Running the pipeline
 """
 
 
-from __future__ import with_statement
+
 import os,sys,copy, multiprocessing
 #from collections import namedtuple
 import collections
@@ -93,24 +93,24 @@ from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 import traceback
 import types
-import itertools
 import textwrap
 import time
 from multiprocessing.managers import SyncManager
 from contextlib import contextmanager
-import cPickle as pickle
-import dbdict
+import pickle as pickle
+from . import dbdict
+from functools import reduce
 
 
 if __name__ == '__main__':
     import sys
     sys.path.insert(0,".")
 
-from graph import *
-from print_dependencies import *
-from ruffus_exceptions import  *
-from ruffus_utility import *
-from file_name_parameters import  *
+from .graph import *
+from .print_dependencies import *
+from .ruffus_exceptions import  *
+from .ruffus_utility import *
+from .file_name_parameters import  *
 
 
 #
@@ -123,7 +123,7 @@ except ImportError:
     json = simplejson
 dumps = json.dumps
 
-import Queue
+import queue
 
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
@@ -636,9 +636,9 @@ class t_job_result(tuple):
 
         def replace(self, **kwds):
             'Return a new t_job_result object replacing specified fields with new values'
-            result = self.make(map(kwds.pop, ('task_name', 'state', 'job_name', 'return_value', 'exception', 'params'), self))
+            result = self.make(list(map(kwds.pop, ('task_name', 'state', 'job_name', 'return_value', 'exception', 'params'), self)))
             if kwds:
-                raise ValueError('Got unexpected field names: %r' % kwds.keys())
+                raise ValueError('Got unexpected field names: %r' % list(kwds.keys()))
             return result
 
         def __getnewargs__(self):
@@ -1385,7 +1385,7 @@ class _task (node):
             # accepts unicode
             if (do_not_expand_single_job_tasks and
                 len(self.output_filenames) and
-                isinstance(self.output_filenames[0], basestring)):
+                isinstance(self.output_filenames[0], str)):
                 return self.output_filenames
             # if it is flattened, might as well sort it
             return sorted(get_strings_in_nested_sequence(self.output_filenames))
@@ -1463,7 +1463,7 @@ class _task (node):
         # replace function / function names with tasks
         #
         tasks = self.task_follows(function_or_func_names)
-        functions_to_tasks = dict(zip(function_or_func_names, tasks))
+        functions_to_tasks = dict(list(zip(function_or_func_names, tasks)))
         input_params = replace_func_names_with_tasks(input_params, functions_to_tasks)
 
         return t_params_tasks_globs_run_time_data(input_params, tasks, globs, runtime_data_names)
@@ -2421,7 +2421,7 @@ class _task (node):
             #
             #   specified by string: unicode or otherwise
             #
-            if isinstance(arg, basestring):
+            if isinstance(arg, str):
                 # string looks up to defined task, use that
                 if node.is_node(arg):
                     arg = node.lookup_node_from_name(arg)
@@ -2678,7 +2678,7 @@ def task_names_to_tasks (task_description, task_names):
     #   In case we are given a single item instead of a list
     #       accepts unicode
     #
-    if isinstance(task_names, basestring) or isinstance(task_names, collections.Callable):
+    if isinstance(task_names, str) or isinstance(task_names, collections.Callable):
     #if isinstance(task_names, basestring) or type(task_names) == types.FunctionType:
         task_names = [task_names]
 
@@ -2789,7 +2789,7 @@ def pipeline_printout_graph (stream,
     forcedtorun_tasks   = task_names_to_tasks ("Forced to run", forcedtorun_tasks)
 
     # open file if (unicode?) string
-    if isinstance(stream, basestring):
+    if isinstance(stream, str):
         stream = open(stream, "w")
 
     #
@@ -3047,7 +3047,7 @@ def make_job_parameter_generator (incomplete_tasks, task_parents, logger, forced
                         log_at_level (logger, 10, verbose, "   Last job for %s. Retired from incomplete tasks in pipeline_run " % job_completed_task._name)
                         incomplete_tasks.remove(job_completed_task)
                         job_completed_task.completed (logger)
-                except Queue.Empty:
+                except queue.Empty:
                     break
 
             for t in list(incomplete_tasks):
@@ -3528,8 +3528,8 @@ def pipeline_run(target_tasks                     = [],
     #
     # prime queue with initial set of job parameters
     #
-    parameter_q = Queue.Queue()
-    task_with_completed_job_q = Queue.Queue()
+    parameter_q = queue.Queue()
+    task_with_completed_job_q = queue.Queue()
     parameter_generator = make_job_parameter_generator (incomplete_tasks, task_parents,
                                                         logger, forcedtorun_tasks,
                                                         task_with_completed_job_q,
@@ -3580,7 +3580,7 @@ def pipeline_run(target_tasks                     = [],
     if pool:
         pool_func = pool.imap_unordered
     else:
-        pool_func = itertools.imap
+        pool_func = map
 
 
 

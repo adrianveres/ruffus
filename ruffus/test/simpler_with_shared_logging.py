@@ -16,7 +16,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 
 # add self to search path for testing
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
@@ -100,7 +100,7 @@ parameters = [
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys,os
@@ -154,7 +154,7 @@ def is_job_uptodate (infiles, outfiles, *extra_params):
     return task.needs_update_check_modify_time (infiles, outfiles, *extra_params)
 
 def test_post_task_function ():
-    print "Hooray"
+    print("Hooray")
 
 import time
 def test_job_io(infiles, outfiles, extra_params):
@@ -204,7 +204,7 @@ def test_job_io(infiles, outfiles, extra_params):
 if __name__ == '__main__':
 
     # get help string
-    f =StringIO.StringIO()
+    f =io.StringIO()
     parser.print_help(f)
     helpstr = f.getvalue()
 
@@ -314,5 +314,5 @@ if __name__ == '__main__':
                             gnu_make_maximal_rebuild_mode  = not options.minimal_rebuild_mode,
                             verbose = options.verbose,
                             logger = logger_proxy)
-    except Exception, e:
-        print e.args
+    except Exception as e:
+        print(e.args)

@@ -280,35 +280,35 @@ class Test_compile_regex (unittest.TestCase):
         self.assertRaises(Exception, compile_regex, "Dummy Task", regex(".*)"), Exception, "test1")
         try:
             compile_regex("Dummy Task", regex(".*)"), Exception, "test1")
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(e.args, ('Dummy Task', "test1: regular expression regex('.*)') is malformed\n[sre_constants.error: (unbalanced parenthesis)]"))
 
         # bad number of items regex
         self.assertRaises(Exception, compile_regex, "Dummy Task", regex(".*", "o"), Exception, "test1")
         try:
             compile_regex("Dummy Task", regex(".*", "o"), Exception, "test1")
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(e.args, ('Dummy Task', "test1: regex('.*', 'o') is malformed\nregex(...) should only be used to wrap a single regular expression string"))
 
         # 0 number of items regex
         self.assertRaises(Exception, compile_regex, "Dummy Task", regex(), Exception, "test1")
         try:
             compile_regex("Dummy Task", regex(), Exception, "test1")
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(e.args, ('Dummy Task', 'test1: regex() is malformed\nregex(...) should only be used to wrap a single regular expression string'))
 
         # bad number of items suffix
         self.assertRaises(Exception, compile_suffix, "Dummy Task", suffix(".*", "o"), Exception, "test1")
         try:
             compile_suffix("Dummy Task", suffix(".*", "o"), Exception, "test1")
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(e.args, ('Dummy Task', "test1: suffix('('.*', 'o')') is malformed.\nsuffix(...) should only be used to wrap a single string matching the suffices of file names"))
 
         # 0 number of items suffix
         self.assertRaises(Exception, compile_suffix, "Dummy Task", suffix(), Exception, "test1")
         try:
             compile_suffix("Dummy Task", suffix(), Exception, "test1")
-        except Exception, e:
+        except Exception as e:
             self.assertEqual(e.args, ('Dummy Task', 'test1: suffix() is malformed.\nsuffix(...) should be used to wrap a string matching the suffices of file names'))
 
 #_________________________________________________________________________________________
@@ -413,7 +413,7 @@ class Test_expand_nested_tasks_or_globs(unittest.TestCase):
     def check_equal (self, a,b):
 
         tasks, globs, runtime_data_names = get_nested_tasks_or_globs(a)
-        func_or_name_to_task = dict(zip((non_str_sequence, get_strings_in_nested_sequence, "what"), self.tasks))
+        func_or_name_to_task = dict(list(zip((non_str_sequence, get_strings_in_nested_sequence, "what"), self.tasks)))
 
         task_or_glob_to_files = dict()
         #for f in func_or_name_to_task:

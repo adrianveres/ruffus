@@ -38,7 +38,7 @@ CNT_COLOUR_SCHEMES = 8
 
 
 import types
-from adjacent_pairs_iterate import adjacent_pairs_iterate
+from .adjacent_pairs_iterate import adjacent_pairs_iterate
 from collections import defaultdict
 def _get_name (node):
     """
@@ -70,7 +70,7 @@ def attributes_to_str (attributes, name):
     #else:
     #    attributes["label"] = '"' + name + '"'
 
-    return "[" + ", ".join ("%s=%s" % (k,v) for k,v in attributes.iteritems()) + "];\n"
+    return "[" + ", ".join ("%s=%s" % (k,v) for k,v in attributes.items()) + "];\n"
 
 
 
@@ -286,7 +286,7 @@ def write_legend_key (stream, used_task_types, minimal_key_legend, colour_scheme
                        "Up-to-date task\\nforced to rerun"   ,
                        "Up-to-date\\nFinal target"           ,
                        "Final target"                      ,]
-    wrapped_task_types = dict(zip(all_task_types, wrapped_task_types))
+    wrapped_task_types = dict(list(zip(all_task_types, wrapped_task_types)))
 
 
     def outputkey (key, task_type, stream):
@@ -412,7 +412,7 @@ def write_flowchart_in_dot_format(  jobs_to_run,
         else:
             colour_scheme_index = 0
         colour_scheme = get_default_colour_scheme(colour_scheme_index)
-        for k, v in user_colour_scheme.items():
+        for k, v in list(user_colour_scheme.items()):
             if k not in colour_scheme:
                 continue
             if isinstance(v, dict):

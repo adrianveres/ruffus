@@ -53,20 +53,21 @@ import os,copy
 import re
 import types
 import glob
+from functools import reduce
 if __name__ == '__main__':
     import sys
     sys.path.insert(0,".")
-from ruffus_exceptions import *
+from .ruffus_exceptions import *
 #import task
 import collections
 from collections import defaultdict
 import multiprocessing.managers
 import hashlib
 import marshal
-import cPickle as pickle
-from itertools import izip
+import pickle as pickle
+
 import operator
-import dbdict
+from . import dbdict
 
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
@@ -119,7 +120,7 @@ def get_default_checksum_level ():
     if len(env_checksum_level) == 1 and env_checksum_level in "0123":
         checksum_level = int(env_checksum_level)
     else:
-        for key, value in globals().iteritems():
+        for key, value in globals().items():
             if key.startswith('CHECKSUM') and key == env_checksum_level:
                 checksum_level = value
 
@@ -184,18 +185,18 @@ class JobHistoryChecksum:
         # checksum the function bytecode as well as the function context
         # Don't use func_code alone-- changing the line number of the function,
         # what global variables are available, etc would all change the checksum
-        func_code = marshal.dumps(task.user_defined_work_func.func_code.co_code)
+        func_code = marshal.dumps(task.user_defined_work_func.__code__.co_code)
 
 
         #
         #   pickle code very defensively, but hopefully without breaking Jake Biesinger's pipelines!
         #
-        attributes_to_pickle = [task.user_defined_work_func.func_defaults,
-                                task.user_defined_work_func.func_code.co_argcount,
-                                task.user_defined_work_func.func_code.co_consts,
-                                task.user_defined_work_func.func_code.co_names,
-                                task.user_defined_work_func.func_code.co_nlocals,
-                                task.user_defined_work_func.func_code.co_varnames]
+        attributes_to_pickle = [task.user_defined_work_func.__defaults__,
+                                task.user_defined_work_func.__code__.co_argcount,
+                                task.user_defined_work_func.__code__.co_consts,
+                                task.user_defined_work_func.__code__.co_names,
+                                task.user_defined_work_func.__code__.co_nlocals,
+                                task.user_defined_work_func.__code__.co_varnames]
 
         pickle_results = []
         for aa in attributes_to_pickle:
@@ -303,7 +304,7 @@ def swap_nesting_order (orig_coll):
     new_dict = defaultdict(dict)
     new_list = []
     for ii, ii_item in enumerate(orig_coll):
-        for jj, value in ii_item.iteritems():
+        for jj, value in ii_item.items():
             if isinstance(jj, int):
                 # resize
                 new_list += [{}]*(jj + 1 - len(new_list))
@@ -325,7 +326,7 @@ def swap_doubly_nested_order (orig_coll):
     new_list = []
     for ii, ii_item in enumerate(orig_coll):
         for jj, jj_item in enumerate(ii_item):
-            for kk, value in jj_item.iteritems():
+            for kk, value in jj_item.items():
                 if isinstance(kk, int):
                     # resize
                     new_list += [{}]*(kk + 1 - len(new_list))
@@ -393,7 +394,7 @@ def get_all_paths_components(paths, compiled_regex):
             ]
     """
     def regex_match_str_list(test_str_list, compiled_regex):
-        if isinstance(compiled_regex, basestring):
+        if isinstance(compiled_regex, str):
             compiled_regex = re.compile(compiled_regex)
         matches = [compiled_regex.search(ss) for ss in test_str_list]
 
@@ -407,7 +408,7 @@ def get_all_paths_components(paths, compiled_regex):
                 else:
                     # no dictionary comprehensions in python 2.6 :-(
                     #matchdicts.append({i : mm.group(i) for i in (range(mm.lastindex) + mm.groupdict().keys())})
-                    matchdicts.append(dict((i, mm.group(i)) for i in (range(mm.lastindex + 1) + mm.groupdict().keys())))
+                    matchdicts.append(dict((i, mm.group(i)) for i in (list(range(mm.lastindex + 1)) + list(mm.groupdict().keys()))))
         return matchdicts
     #
     #   merge regular expression matches and path decomposition
@@ -418,7 +419,7 @@ def get_all_paths_components(paths, compiled_regex):
     else:
         regex_match_components = regex_match_str_list(paths, compiled_regex)
         both_components = []
-        for rr, pp in izip(regex_match_components, path_components):
+        for rr, pp in zip(regex_match_components, path_components):
             if rr == None:
                 #
                 #   previously failed regular expression matches would taint file
@@ -444,7 +445,7 @@ def get_all_paths_components(paths, compiled_regex):
 #   apply_func_to_sequence
 #
 #_________________________________________________________________________________________
-def apply_func_to_sequence(seq, func, tuple_of_conforming_types = (basestring,), tuple_of_sequences_types = (list, tuple,set)):
+def apply_func_to_sequence(seq, func, tuple_of_conforming_types = (str,), tuple_of_sequences_types = (list, tuple,set)):
     """
     Recurses into list/tuple/set sequences to apply func to conforming types
     Non-conforming types are left alone
@@ -661,7 +662,7 @@ def get_strings_in_nested_sequence_aux(p, l = None):
     """
     if l == None:
         l = []
-    if isinstance(p, basestring):
+    if isinstance(p, str):
         l.append(p)
     elif non_str_sequence (p):
         for pp in p:
@@ -684,7 +685,7 @@ def get_strings_in_nested_sequence (p, first_only = False):
     #
     #  string is returned as list of single string
     #
-    if isinstance(p, basestring):
+    if isinstance(p, str):
         return [p]
 
     #
@@ -719,7 +720,7 @@ def get_first_string_in_nested_sequence (p):
     #
     #  string is returned as list of single string
     #
-    if isinstance(p, basestring):
+    if isinstance(p, str):
         return p
 
     #
@@ -754,7 +755,7 @@ def ignore_unknown_encoder(obj):
 def shorten_filenames_encoder (obj):
     if non_str_sequence (obj):
         return "[%s]" % ", ".join(map(shorten_filenames_encoder, obj))
-    if isinstance(obj, basestring):
+    if isinstance(obj, str):
         if os.path.isabs(obj) and obj[1:].count('/') > 1:
             return os.path.split(obj)[1]
     return ignore_unknown_encoder(obj)
@@ -806,7 +807,7 @@ def get_nested_tasks_or_globs(p, treat_strings_as_tasks = False, runtime_data_na
         for pp in p.args:
             get_nested_tasks_or_globs(pp, True, runtime_data_names, tasks, globs)
 
-    elif isinstance(p, basestring):
+    elif isinstance(p, str):
         if treat_strings_as_tasks:
             tasks.add(p)
         elif is_glob(p):
@@ -847,7 +848,7 @@ def replace_func_names_with_tasks(p, func_or_name_to_task, treat_strings_as_task
     #
     # strings become tasks if treat_strings_as_tasks
     #
-    if isinstance(p, basestring):
+    if isinstance(p, str):
         if treat_strings_as_tasks:
             return func_or_name_to_task[p]
         return p
@@ -946,7 +947,7 @@ def compile_regex(enclosing_task, regex, error_object, descriptor_string, regex_
     """
     throw error unless regular expression compiles
     """
-    if not len(regex.args) or len(regex.args) > 1 or not isinstance(regex.args[0], basestring):
+    if not len(regex.args) or len(regex.args) > 1 or not isinstance(regex.args[0], str):
         regex_str = str(regex.args)
         if len(regex.args) > 1:
             regex_str = regex_str[1:-1]
@@ -987,7 +988,7 @@ def compile_suffix(enclosing_task, regex, error_object, descriptor_string):
         raise error_object(enclosing_task, "%s: " % descriptor_string +
                                     "suffix() is malformed.\n" +
                                      "suffix(...) should be used to wrap a string matching the suffices of file names")
-    if len(regex.args) > 1 or not isinstance(regex.args[0], basestring):
+    if len(regex.args) > 1 or not isinstance(regex.args[0], str):
         raise error_object(enclosing_task, "%s: " % descriptor_string +
                                    "suffix('%s') is malformed.\n" % (regex.args,) +
                                     "suffix(...) should only be used to wrap a single string matching the suffices of file names")
@@ -1014,7 +1015,7 @@ def check_parallel_parameters (enclosing_task, params, error_object):
         raise Exception("@parallel parameters is empty.")
 
     for job_param in params:
-        if isinstance(job_param, basestring):
+        if isinstance(job_param, str):
             message = ("Wrong syntax for @parallel.\n"
                         "@parallel(%s)\n" % ignore_unknown_encoder(params) +
                         "If you are supplying parameters for a task "
@@ -1043,7 +1044,7 @@ def check_files_io_parameters (enclosing_task, params, error_object):
 
     try:
         for job_param in params:
-            if isinstance(job_param, basestring):
+            if isinstance(job_param, str):
                 raise TypeError
 
             if len(job_param) < 1:
@@ -1088,7 +1089,7 @@ def expand_nested_tasks_or_globs(p, tasksglobs_to_filenames):
     #
     # Expand globs or tasks as a list only if they are top level
     #
-    if (    (isinstance(p, basestring) and is_glob(p) and p in tasksglobs_to_filenames) or
+    if (    (isinstance(p, str) and is_glob(p) and p in tasksglobs_to_filenames) or
             p.__class__.__name__ == '_task'     or
             isinstance(p, runtime_parameter)    ):
         return tasksglobs_to_filenames[p]
@@ -1096,7 +1097,7 @@ def expand_nested_tasks_or_globs(p, tasksglobs_to_filenames):
     #
     # No expansions of strings and dictionaries
     #
-    if isinstance(p, (basestring, dict)):
+    if isinstance(p, (str, dict)):
         return p
 
     #
@@ -1105,7 +1106,7 @@ def expand_nested_tasks_or_globs(p, tasksglobs_to_filenames):
     elif non_str_sequence(p):
         l = list()
         for pp in p:
-            if (isinstance(pp, basestring) and pp in tasksglobs_to_filenames):
+            if (isinstance(pp, str) and pp in tasksglobs_to_filenames):
                 l.extend(tasksglobs_to_filenames[pp])
             elif pp.__class__.__name__ == '_task' or isinstance(pp, runtime_parameter):
                 files = tasksglobs_to_filenames[pp]
@@ -1142,7 +1143,7 @@ class output_from(object):
 
 class runtime_parameter(object):
     def __init__ (self, *args):
-        if len(args) != 1 or not isinstance(args[0], basestring):
+        if len(args) != 1 or not isinstance(args[0], str):
             raise Exception("runtime_parameter takes the name of the run time parameter as a single string")
         self.args = args
 

@@ -12,7 +12,7 @@ import unittest
 import os
 import sys
 import shutil
-from StringIO import StringIO
+from io import StringIO
 import time
 import re
 

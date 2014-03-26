@@ -16,7 +16,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 
 # add self to search path for testing
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
@@ -51,7 +51,7 @@ logger, logger_mutex = cmdline.setup_logging (__name__, options.log_file, option
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys,os

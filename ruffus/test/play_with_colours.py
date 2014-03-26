@@ -55,7 +55,7 @@ else:
 
 
 from optparse import OptionParser
-import StringIO
+import io
 
 parser = OptionParser(version="%play_with_colours 1.0",
                       usage = "\n\n    play_with_colours "

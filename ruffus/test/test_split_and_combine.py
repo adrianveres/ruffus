@@ -27,7 +27,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 import re,time
 
 # add self to search path for testing
@@ -117,7 +117,7 @@ parameters = [
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys,os
@@ -146,7 +146,7 @@ except ImportError:
 
 
 # get help string
-f =StringIO.StringIO()
+f =io.StringIO()
 parser.print_help(f)
 helpstr = f.getvalue()
 (options, remaining_args) = parser.parse_args()
@@ -240,7 +240,7 @@ def start_pipeline_afresh ():
     """
     Recreate directory and starting file
     """
-    print >>verbose_output, "Start again"
+    print("Start again", file=verbose_output)
     import os
     os.system("rm -rf %s" % tempdir)
     os.makedirs(tempdir)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
                             logger = stderr_logger if options.verbose else black_hole_logger,
                             verbose = options.verbose)
         os.system("rm -rf %s" % tempdir)
-        print "OK"
+        print("OK")
     else:
         pipeline_run(options.target_tasks, options.forced_tasks, multiprocess = options.jobs,
                             logger = stderr_logger if options.verbose else black_hole_logger,

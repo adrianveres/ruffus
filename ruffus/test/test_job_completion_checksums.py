@@ -12,7 +12,7 @@ import unittest
 import os
 import sys
 import shutil
-from StringIO import StringIO
+from io import StringIO
 import time
 
 exe_path = os.path.split(os.path.abspath(sys.argv[0]))[0]
@@ -27,7 +27,7 @@ from ruffus.ruffus_utility import (RUFFUS_HISTORY_FILE,
                                    CHECKSUM_FUNCTIONS_AND_PARAMS)
 from ruffus.ruffus_exceptions import RethrownJobError
 
-possible_chksms = range(CHECKSUM_FUNCTIONS_AND_PARAMS + 1)
+possible_chksms = list(range(CHECKSUM_FUNCTIONS_AND_PARAMS + 1))
 workdir = 'tmp_test_job_completion/'
 input_file = os.path.join(workdir, 'input.txt')
 transform1_out = input_file.replace('.txt', '.output')
@@ -154,7 +154,7 @@ class TestJobCompletion(unittest.TestCase):
         with open(input_file, 'w') as outfile:
             outfile.write('testme')
         pipeline_run([transform1], verbose=0, checksum_level=CHECKSUM_HISTORY_TIMESTAMPS)
-        transform1.func_code = split1.func_code  # simulate source change
+        transform1.__code__ = split1.__code__  # simulate source change
 
         for chksm in possible_chksms:
             s = StringIO()
@@ -174,7 +174,7 @@ class TestJobCompletion(unittest.TestCase):
             outfile.write('testme')
         pipeline_run([transform1], verbose=0, checksum_level=CHECKSUM_HISTORY_TIMESTAMPS)
         # simulate source change
-        split1.func_code, transform1.func_code = transform1.func_code, split1.func_code
+        split1.__code__, transform1.__code__ = transform1.__code__, split1.__code__
 
         for chksm in possible_chksms:
             s = StringIO()
@@ -186,7 +186,7 @@ class TestJobCompletion(unittest.TestCase):
             else:
                 self.assertIn('Job up-to-date', s.getvalue())
         # clean up our function-changing mess!
-        split1.func_code, transform1.func_code = transform1.func_code, split1.func_code
+        split1.__code__, transform1.__code__ = transform1.__code__, split1.__code__
 
     def test_ouput_up_to_date_param_changed(self):
         """Input file exists, output up to date, parameter to function changed"""

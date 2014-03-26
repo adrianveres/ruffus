@@ -23,7 +23,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 import re,time
 
 # add self to search path for testing
@@ -38,7 +38,7 @@ else:
 
 
 import ruffus
-print ruffus.__version__
+print(ruffus.__version__)
 parser = OptionParser(version="%%prog v1.0, ruffus v%s" % ruffus.ruffus_version.__version)
 parser.add_option("-t", "--target_tasks", dest="target_tasks",
                   action="append",
@@ -104,7 +104,7 @@ parameters = [
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 
-import StringIO
+import io
 import re
 import operator
 import sys,os
@@ -133,7 +133,7 @@ except ImportError:
 
 
 # get help string
-f =StringIO.StringIO()
+f =io.StringIO()
 parser.print_help(f)
 helpstr = f.getvalue()
 (options, remaining_args) = parser.parse_args()
@@ -145,13 +145,13 @@ helpstr = f.getvalue()
 
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
-directories = [os.path.abspath(u'a'), u'b']    
-@follows(mkdir(directories), mkdir(u'c'), mkdir(u'd', u'e'), mkdir(u'e'))
-@posttask(touch_file(u'f'))
+directories = [os.path.abspath('a'), 'b']    
+@follows(mkdir(directories), mkdir('c'), mkdir('d', 'e'), mkdir('e'))
+@posttask(touch_file('f'))
 def task_which_makes_directories ():
     pass
 
-@files(None, [u"g", u"h"])
+@files(None, ["g", "h"])
 def task_which_makes_files (i, o):
     for f in o:
         open(f, 'w')

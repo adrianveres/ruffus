@@ -18,7 +18,7 @@
 from optparse import OptionParser
 import sys, os
 import os.path
-import StringIO
+import io
 import re
 
 # add self to search path for testing
@@ -104,7 +104,7 @@ parameters = [
 
 #88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
 import time
-import StringIO
+import io
 import re
 import operator
 import sys,os
@@ -165,7 +165,7 @@ def test_job_io(infiles, outfiles, extra_params):
 
 
 # get help string
-f =StringIO.StringIO()
+f =io.StringIO()
 parser.print_help(f)
 helpstr = f.getvalue()
 (options, remaining_args) = parser.parse_args()
@@ -190,7 +190,7 @@ tempdir = "temp_branching_dir/"
 #
 #    task1
 #
-@originate([tempdir + d for d in 'a.1', 'b.1', 'c.1'])
+@originate([tempdir + d for d in ('a.1', 'b.1', 'c.1')])
 @follows(mkdir(tempdir))
 @posttask(lambda: open(tempdir + "task.done", "a").write("Task 1 Done\n"))
 def task1(outfile, *extra_params):
@@ -352,9 +352,9 @@ def check_final_output_correct(after_touch_files = False):
     final_6_contents = sorted([l.rstrip() for l in open(tempdir + "final.6", "r").readlines()])
     if final_6_contents != expected_output:
         for ll in final_6_contents:
-            print >>sys.stderr, ll
+            print(ll, file=sys.stderr)
         for ll in orig_expected_output:
-            print >>sys.stderr, ll
+            print(ll, file=sys.stderr)
         for i, (l1, l2) in enumerate(zip(final_6_contents, expected_output)):
             if l1 != l2:
                 sys.stderr.write("%d\n  >%s<\n  >%s<\n" % (i, l1, l2))
@@ -366,8 +366,8 @@ def check_final_output_correct(after_touch_files = False):
 #       see: http://docs.python.org/library/multiprocessing.html#multiprocessing-programming
 #
 if __name__ == '__main__':
-    print >>sys.stderr, "Python version %s" % sys.version
-    print >>sys.stderr, "Ruffus version %s" % ruffus.__version__
+    print("Python version %s" % sys.version, file=sys.stderr)
+    print("Ruffus version %s" % ruffus.__version__, file=sys.stderr)
     if options.just_print:
         pipeline_printout(sys.stdout, options.target_tasks, options.forced_tasks,
                             verbose=options.verbose)
@@ -408,7 +408,7 @@ if __name__ == '__main__':
             #   remove b.1 and touch
             #
             if options.verbose:
-                print "\n\nNow just touch files for task2...\n"
+                print("\n\nNow just touch files for task2...\n")
             os.unlink(os.path.join(tempdir, "b.1"))
             pipeline_run([task2], options.forced_tasks, multiprocess = options.jobs,
                                 logger = stderr_logger if options.verbose else black_hole_logger,
@@ -421,7 +421,7 @@ if __name__ == '__main__':
             #   Now wait for the empty b.1 to show up in the output
             #
             if options.verbose:
-                print "\n\nRun normally...\n"
+                print("\n\nRun normally...\n")
             pipeline_run(options.target_tasks, options.forced_tasks, multiprocess = options.jobs,
                                 logger = stderr_logger if options.verbose else black_hole_logger,
                                 gnu_make_maximal_rebuild_mode  = not options.minimal_rebuild_mode,
@@ -432,7 +432,7 @@ if __name__ == '__main__':
 
 
 
-            print "OK"
+            print("OK")
         import  shutil
         shutil.rmtree(tempdir)
     else:
@@ -440,4 +440,4 @@ if __name__ == '__main__':
                             logger = stderr_logger if options.verbose else black_hole_logger,
                              gnu_make_maximal_rebuild_mode  = not options.minimal_rebuild_mode,
                             verbose = options.verbose, touch_files_only = options.touch_files_only)
-        print "OK"
+        print("OK")
