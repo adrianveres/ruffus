@@ -189,7 +189,7 @@ Usage
         packages=['ruffus'],
         package_dir={'ruffus': 'ruffus'},
         include_package_data = True,    # include everything in source control
-        use_2to3=True
+        # use_2to3=True
         #package_data = {
         #    # If any package contains *.txt files, include them:
         #    '': ['*.TXT'],                                \
